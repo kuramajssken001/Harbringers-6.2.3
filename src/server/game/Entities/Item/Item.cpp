@@ -513,7 +513,7 @@ void Item::SaveToDB(SQLTransaction& trans)
             stmt->setUInt32(++index, GetModifier(eItemModifiers::UpgradeID));
             stmt->setUInt16(++index, GetUInt32Value(ITEM_FIELD_DURABILITY));
             stmt->setUInt32(++index, GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME));
-            stmt->setString(++index, m_text);
+            stmt->setString(++index, m_text.data(), m_text.size());
             stmt->setUInt32(++index, m_CustomFlags);
             stmt->setUInt32(++index, GetModifier(eItemModifiers::EnchantIllusion));
             stmt->setUInt32(++index, guid);
