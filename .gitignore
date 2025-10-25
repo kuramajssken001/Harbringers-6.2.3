@@ -74,7 +74,7 @@ build/*
 *.pidb
 *.log
 *.scc
-
+build2019/*
 # Visual C++ cache files
 ipch/
 *.aps
