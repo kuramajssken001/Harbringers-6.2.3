@@ -1140,7 +1140,7 @@ void WorldSession::LoadAccountData(PreparedQueryResult result, uint32 mask)
     do
     {
         Field* fields = result->Fetch();
-        uint32 type = fields[0].GetUInt32();
+        uint32 type = fields[0].GetUInt8();
         if (type >= NUM_ACCOUNT_DATA_TYPES)
         {
             sLog->outError(LOG_FILTER_GENERAL, "Table `%s` have invalid account data type (%u), ignore.",
@@ -1182,7 +1182,7 @@ void WorldSession::SetAccountData(AccountDataType type, time_t tm, std::string d
 
     PreparedStatement* stmt = SessionRealmDatabase.GetPreparedStatement(index);
     stmt->setUInt32(0, id);
-    stmt->setUInt32 (1, type);
+    stmt->setUInt8 (1, type);
     stmt->setUInt32(2, uint32(tm));
     stmt->setString(3, data);
     SessionRealmDatabase.Execute(stmt);
