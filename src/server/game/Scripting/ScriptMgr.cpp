@@ -1165,6 +1165,15 @@ bool ScriptMgr::OnItemUse(Player* p_Player, Item* p_Item, const SpellCastTargets
     return tmpscript->OnUse(p_Player, p_Item, p_SpellCastTargets);
 }
 
+bool ScriptMgr::OnItemGossipSelect(Player* p_Player, Item* p_Item, uint32 p_Sender, uint32 p_Action)
+{
+    ASSERT(p_Player);
+    ASSERT(p_Item);
+
+    GET_SCRIPT_RET(ItemScript, p_Item->GetScriptId(), tmpscript, false);
+    return tmpscript->OnItemGossipSelect(p_Player, p_Item, p_Sender, p_Action);
+}
+
 /// Called when a player opnes the item
 /// @p_Player : The Player who has used this item
 /// @p_Item   : Used Item instance

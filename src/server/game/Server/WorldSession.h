@@ -554,6 +554,7 @@ class WorldSession
 #ifndef CROSS
         //auction
         void SendAuctionHello(uint64 p_Guid, Creature* p_Unit);
+        void SendAuctionHello(uint64 p_Guid);
         void SendAuctionCommandResult(AuctionEntry* p_Auction, uint32 p_Action, uint32 p_Error, uint32 p_BidError = 0);
         void SendAuctionBidderNotification(AuctionEntry* p_Auction, uint64 p_Bidder, uint64 p_BidSum);
         void SendAuctionOwnerNotification(AuctionEntry* p_Auction);

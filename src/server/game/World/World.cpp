@@ -2335,6 +2335,9 @@ void World::SetInitialWorldSettings()
     sLog->EnableDBAppenders();
 
     sWildBattlePetMgr->PopulateAll();
+
+    //custom
+    sObjectMgr->LoadMultiItem();
 }
 
 void World::DetectDBCLang()

@@ -159,6 +159,7 @@ public:
             { "areatrigger_move",             SEC_ADMINISTRATOR, true,  &HandleReloadAreatriggerMoveCommand,            "", NULL },
             { "disabled_ranking",             SEC_ADMINISTRATOR, true,  &HandleReloadDisabledRankingCommand,            "", NULL },
             { "conversation",                 SEC_ADMINISTRATOR, true,  &HandleReloadConversationsCommand,              "", NULL },
+            { "item_gossip",                  SEC_ADMINISTRATOR, true,  &HandleReloadCustomItemGossipCommand,           "", NULL },
             { NULL,                           0,                 false, NULL,                                           "", NULL }
         };
         static ChatCommand commandTable[] =
@@ -167,6 +168,13 @@ public:
             { NULL,             0,                  false, NULL,                               "", NULL }
         };
         return commandTable;
+    }
+
+    static bool HandleReloadCustomItemGossipCommand(ChatHandler* p_Handler, char const* /*p_Args*/)
+    {
+        sObjectMgr->LoadMultiItem();
+        p_Handler->SendGlobalGMSysMessage("DB tables `_multi_item` reloaded.");
+        return true;
     }
 
     static bool HandleReloadConversationsCommand(ChatHandler* p_Handler, char const* /*p_Args*/)

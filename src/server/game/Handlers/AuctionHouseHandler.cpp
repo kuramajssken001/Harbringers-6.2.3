@@ -63,6 +63,26 @@ void WorldSession::SendAuctionHello(uint64 p_Guid, Creature* p_Unit)
     SendPacket(&l_Data);
 }
 
+void WorldSession::SendAuctionHello(uint64 p_Guid)
+{
+    if (m_Player->getLevel() < sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ))
+    {
+        SendNotification(GetTrinityString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
+        return;
+    }
+
+    AuctionHouseEntry const* l_AuctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(35);
+    if (!l_AuctionHouseEntry)
+        return;
+
+    WorldPacket l_Data(SMSG_AUCTION_HELLO_RESPONSE, 12);
+    l_Data.appendPackGUID(p_Guid);                          ///< Guid
+    l_Data.WriteBit(1);                                     ///< OpenForBusiness
+    l_Data.FlushBits();
+
+    SendPacket(&l_Data);
+}
+
 // Call this method when player bids, creates, or deletes auction
 void WorldSession::SendAuctionCommandResult(AuctionEntry* p_Auction, uint32 p_Action, uint32 p_Error, uint32 p_BidError)
 {

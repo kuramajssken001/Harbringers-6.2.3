@@ -11314,3 +11314,205 @@ void ObjectMgr::LoadConversationTemplates()
 
 	sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u conversation templates in %u ms.", l_Count, GetMSTimeDiffToNow(l_OldMSTime));
 }
+
+void ObjectMgr::LoadMultiItem()
+{
+	m_MultiItemMap.clear();		               //    0     1     2		3	     4	    5        6         5          6          7           8        9      10       11      12       13      14
+	QueryResult result = WorldDatabase.Query("SELECT id, Class, Icon, Title, usetype, TeamID, NeedClass, NeedType, NeedItemID, NeedCount, NeedLevel,tele_x, tele_y, tele_z, tele_o, tele_map, vip FROM _multi_item");
+
+	if (!result)
+		return;
+
+	uint32 counter = 0;
+	Multi_Item Multi_NpcSt;
+	do
+	{
+		Field* fields = result->Fetch();
+		Multi_NpcSt.id = fields[0].GetUInt32();
+		Multi_NpcSt.Class = fields[1].GetUInt32();
+		Multi_NpcSt.Icon = fields[2].GetUInt32();
+		Multi_NpcSt.Title = fields[3].GetString();
+		Multi_NpcSt.usetype = fields[4].GetUInt32();
+		Multi_NpcSt.TeamID = fields[5].GetUInt32();
+		Multi_NpcSt.NeedClass = fields[6].GetUInt32();
+		Multi_NpcSt.NeedType = fields[7].GetUInt32();
+		Multi_NpcSt.NeedItemID = fields[8].GetUInt32();
+		Multi_NpcSt.NeedCount = fields[9].GetUInt32();
+		Multi_NpcSt.NeedLevel = fields[10].GetUInt32();
+		Multi_NpcSt.tele_x = fields[11].GetFloat();
+		Multi_NpcSt.tele_y = fields[12].GetFloat();
+		Multi_NpcSt.tele_z = fields[13].GetFloat();
+		Multi_NpcSt.tele_o = fields[14].GetFloat();
+		Multi_NpcSt.tele_map = fields[15].GetUInt32();
+		Multi_NpcSt.vip = fields[16].GetUInt32();
+
+		m_MultiItemMap.insert(MultiItemMap::value_type(Multi_NpcSt.id, Multi_NpcSt));
+		++counter;
+	} while (result->NextRow());
+	sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading _multi_item table count %u", counter);
+}
+
+void ObjectMgr::LoadMultiItemMenu(uint32 MenuId, Player* player, Item* item)
+{
+	player->PlayerTalkClass->ClearMenus();
+	if (m_MultiItemMap.begin() == m_MultiItemMap.end())
+		return;
+
+	if (player->GetTeamId() == TEAM_NEUTRAL)
+		return;
+
+	uint32 team;
+	team = player->GetTeamId() == TEAM_ALLIANCE ? ALLIANCE : HORDE;
+	if (MenuId == 0)
+	{
+		for (MultiItemMap::iterator ltr = m_MultiItemMap.begin(); ltr != m_MultiItemMap.end(); ++ltr)
+		{
+			if (ltr->second.Class == MenuId && (player->getClass() == ltr->second.NeedClass || ltr->second.NeedClass == 0) && ((ltr->second.NeedLevel < 0 ? player->getLevel() < abs(ltr->second.NeedLevel) : player->getLevel() >= ltr->second.NeedLevel) || ltr->second.NeedLevel == 0))
+			{
+				if (ltr->second.TeamID == 0 || team == ltr->second.TeamID)
+				{
+					player->ADD_GOSSIP_ITEM(ltr->second.Icon, ltr->second.Title.c_str(), ltr->second.id, ltr->second.usetype + 1000);
+				}
+			}
+		}
+	}
+	else
+	{
+		for (MultiItemMap::iterator ltr = m_MultiItemMap.begin(); ltr != m_MultiItemMap.end(); ++ltr)
+		{
+			if (MenuId == ltr->second.Class && (player->getClass() == ltr->second.NeedClass || ltr->second.NeedClass == 0) && ((ltr->second.NeedLevel < 0 ? player->getLevel() < abs(ltr->second.NeedLevel) : player->getLevel() >= ltr->second.NeedLevel) || ltr->second.NeedLevel == 0))
+			{
+				if (ltr->second.TeamID == 0 || team == ltr->second.TeamID)
+				{
+					player->ADD_GOSSIP_ITEM(ltr->second.Icon, ltr->second.Title.c_str(), ltr->second.id, ltr->second.usetype + 1000);
+				}
+			}
+		}
+	}
+	player->PlayerTalkClass->SendGossipMenu(907, item->GetGUID());
+}
+
+void ObjectMgr::TeleportItemFromMenuId(Player* player, uint32 MenuId)
+{
+	MultiItemMap::const_iterator ltr = m_MultiItemMap.find(MenuId);
+	if (ltr == m_MultiItemMap.end())
+		return;
+
+	float x = ltr->second.tele_x;
+	float y = ltr->second.tele_y;
+	float z = ltr->second.tele_z;
+	float O = ltr->second.tele_o;
+	uint32 mapId = ltr->second.tele_map;
+	player->TeleportTo(mapId, x, y, z, O, false);
+}
+
+bool ObjectMgr::RunMultiItemMenu(uint32 action, uint32 sender, Player* player, Item* item)
+{
+	SpellCastTargets my_targets;
+	my_targets.SetTradeItemTarget(player);
+
+	player->PlayerTalkClass->ClearMenus();
+
+	MultiItemMap::iterator itr = m_MultiItemMap.find(sender);
+
+	if (m_MultiItemMap.begin() == m_MultiItemMap.end())
+		return false;
+	uint64 needmoney = itr->second.NeedCount * 10000;
+	uint32 needtoken = itr->second.NeedCount;
+	switch (itr->second.NeedType)
+	{
+	case 1:
+
+		if (player->GetMoney() < needmoney)
+		{
+			ChatHandler(player->GetSession()).PSendSysMessage("you need %u Gold", needmoney / 10000);
+			player->CLOSE_GOSSIP_MENU();
+			return false;
+		}
+		else
+			player->ModifyMoney(-int32(needmoney));
+		break;
+	case 2:
+		if (!player->HasItemCount(itr->second.NeedItemID, itr->second.NeedCount))
+		{
+			ChatHandler(player->GetSession()).PSendSysMessage("you need |cffffffff|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r X %u count.", itr->second.NeedItemID, GetItemNameLink(itr->second.NeedItemID).c_str(), uint32(itr->second.NeedCount));
+			player->CLOSE_GOSSIP_MENU();
+			return false;
+		}
+		else
+			player->DestroyItemCount(itr->second.NeedItemID, itr->second.NeedCount, true);
+		break;
+	/*case 3:
+		if (player->GetDonateTokens() < uint64(needtoken))
+		{
+			ChatHandler(player->GetSession()).PSendSysMessage(GetGameString(3), needtoken);
+			player->CLOSE_GOSSIP_MENU();
+			return false;
+		}
+		else
+			player->DestroyDonateTokenCount(uint64(needtoken));
+		break;*/
+	}
+	switch (action)
+	{
+	/*case 1001:
+		sBattlePayMgr->SendPointsBalance(player->GetSession());
+		player->CLOSE_GOSSIP_MENU();
+		break;*/
+	case 1002:
+		LoadMultiItemMenu(sender, player, item);
+		return true;
+	case 1003:
+		player->ResetTalents(true);
+		player->SendTalentsInfoData(false);
+		ChatHandler(player->GetSession()).PSendSysMessage(LANG_RESET_TALENTS);
+		player->CLOSE_GOSSIP_MENU();
+		return true;
+	case 1004:
+		player->CLOSE_GOSSIP_MENU();
+		TeleportItemFromMenuId(player, sender);
+		break;
+    /*case 1005:
+		player->GetSession()->SendListInventory(item->GetGUID(), itr->second.NeedItemID);
+		return true;*/
+	case 1006:
+		player->GetSession()->SendShowBank(player->GetGUID());
+		return true;
+	case 1007:
+		player->GetSession()->SendAuctionHello(player->GetGUID());
+		return true;
+	case 1008:
+		player->DurabilityRepairAll(false, 1.0f, 0);
+		player->CLOSE_GOSSIP_MENU();
+		return true;
+	case 1009:
+		player->CastSpell(player, itr->second.NeedItemID, true);
+		player->CastSpell(player, 10723, true);
+		player->CLOSE_GOSSIP_MENU();
+		return true;
+	case 1010:
+		player->AddItem(itr->second.NeedItemID, itr->second.tele_map);
+		player->CLOSE_GOSSIP_MENU();
+		return true;
+	case 1099:
+		LoadMultiItemMenu(0, player, item);
+		return true;
+	}
+
+	return true;
+}
+
+std::string ObjectMgr::GetItemNameLink(uint32 ItemId)
+{
+	if (ItemId == 0)
+		return "<UnKnow>";
+
+	ItemTemplate const* proto = sObjectMgr->GetItemTemplate(ItemId);
+	if (!proto)
+		return "<UnKnow>";
+
+	std::string Name = proto->Name1->Get(sWorld->GetDefaultDbcLocale());
+	if (Name.empty())
+		return "<UnKnow>";
+	return Name.c_str();
+}

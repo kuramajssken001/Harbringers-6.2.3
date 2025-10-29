@@ -102,6 +102,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
 
     Creature* unit = NULL;
     GameObject* go = NULL;
+    Item* item = NULL;
     if (IS_CRE_OR_VEH_GUID(guid))
     {
         unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
@@ -113,6 +114,13 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         go = m_Player->GetMap()->GetGameObject(guid);
 
         if (!go)
+            return;
+    }
+    else if (IS_ITEM_GUID(guid))
+    {
+        item = m_Player->GetItemByGuid(guid);
+
+        if (!item)
             return;
     }
     else
@@ -157,11 +165,15 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
             if (!sScriptMgr->OnGossipSelect(m_Player, unit, m_Player->PlayerTalkClass->GetGossipOptionSender(gossipListId), m_Player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
                 m_Player->OnGossipSelect(unit, gossipListId, menuId);
         }
-        else
+        else if (go)
         {
             go->AI()->GossipSelect(m_Player, menuId, gossipListId);
             if (!sScriptMgr->OnGossipSelect(m_Player, go, m_Player->PlayerTalkClass->GetGossipOptionSender(gossipListId), m_Player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
                 m_Player->OnGossipSelect(go, gossipListId, menuId);
+        }
+        else if (item)
+        {
+            sScriptMgr->OnItemGossipSelect(m_Player, item, m_Player->PlayerTalkClass->GetGossipOptionSender(gossipListId), m_Player->PlayerTalkClass->GetGossipOptionAction(gossipListId));
         }
     }
 }

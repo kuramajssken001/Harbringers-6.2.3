@@ -864,6 +864,28 @@ typedef std::vector<ResearchPOIPoint> ResearchPOIPoints;
 typedef std::map<uint32 /*site id*/, ResearchZoneEntry> ResearchZoneMap;
 typedef std::map<uint32, std::vector<RecipesConditions>> NpcRecipesContainer;
 
+struct Multi_Item
+{
+    uint32 id;
+    uint32 Class;
+    uint32 Icon;
+    std::string Title;
+    uint32 usetype;
+    uint32 TeamID;
+    uint32 NeedType;
+    uint32 NeedClass;
+    uint32 NeedItemID;
+    uint32 NeedCount;
+    int32 NeedLevel;
+    float tele_x;
+    float tele_y;
+    float tele_z;
+    float tele_o;
+    uint32 tele_map;
+    uint32 vip;
+};
+typedef std::map<uint32, Multi_Item> MultiItemMap;
+
 #ifndef CROSS
 class PlayerDumpReader;
 #endif /* not CROSS */
@@ -908,6 +930,13 @@ class ObjectMgr
         int LoadReferenceVendor(int32 vendor, int32 item, uint8 type, std::set<uint32>* skip_vendors);
 
         void LoadGameObjectTemplate();
+
+        void LoadMultiItem();
+        void LoadMultiItemMenu(uint32 /*menuid*/, Player* /*player*/, Item* /*creature*/);
+        bool RunMultiItemMenu(uint32 /*action*/, uint32 /*sender*/, Player* /*player*/, Item* /*creature*/);
+        void TeleportItemFromMenuId(Player* player, uint32 MenuId);
+        MultiItemMap m_MultiItemMap;
+        std::string GetItemNameLink(uint32 ItemId);
 
         void LoadGarrisonPlotBuildingContent();
         void AddGarrisonPlotBuildingContent(GarrisonPlotBuildingContent& p_Data);

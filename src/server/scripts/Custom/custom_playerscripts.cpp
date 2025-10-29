@@ -81,9 +81,46 @@ class PlayerScript_meta_achievement_midsummer : public PlayerScript
         }
 };
 
+class multi_item : public ItemScript
+{
+public:
+    multi_item() : ItemScript("multi_item") {}
+
+    bool OnUse(Player* player, Item* item, SpellCastTargets const&)
+    {
+        if (!player->isInCombat())
+        {
+            OnGossipHello(player, item);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    bool OnGossipHello(Player* player, Item* pitem)
+    {
+        sObjectMgr->LoadMultiItemMenu(0, player, pitem);
+        return true;
+    }
+
+    bool OnItemGossipSelect(Player* player, Item* pitem, uint32 uiSender, uint32 uiAction)
+    {
+        if (uiAction == 1900)
+        {
+            player->PlayerTalkClass->ClearMenus();
+            sObjectMgr->LoadMultiItemMenu(0, player, pitem);
+            return true;
+        }
+        player->PlayerTalkClass->ClearMenus();
+        sObjectMgr->RunMultiItemMenu(uiAction, uiSender, player, pitem);
+        return true;
+    }
+};
+
 #ifndef __clang_analyzer__
 void AddSC_CustomPlayerscripts()
 {
     new PlayerScript_meta_achievement_midsummer();
+    new multi_item();
 }
 #endif

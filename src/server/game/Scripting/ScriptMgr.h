@@ -370,7 +370,7 @@ class ScriptMgr
         /// @p_Item             : Used Item instance
         /// @p_SpellCastTargets : Item spell action targets
         bool OnItemUse(Player* p_Player, Item* p_Item, SpellCastTargets const& p_SpellCastTargets);
-
+        bool OnItemGossipSelect(Player* player, Item* pitem, uint32 uiSender, uint32 uiAction);
         /// Called when a player open the item
         /// @p_Player : The Player who has used this item
         /// @p_Item   : Used Item instance

@@ -60,7 +60,13 @@ class ItemScript : public ScriptObjectImpl<true>
 
             return false;
         }
-        
+        virtual bool OnItemGossipSelect(Player* p_Player, Item* p_Item, uint32 p_Sender, uint32 p_Action)
+        {
+            UNUSED(p_Player);
+            UNUSED(p_Item);
+
+            return false;
+        }
         /// Called when a player open the item
         /// @p_Player : The Player who has used this item
         /// @p_Item   : Used Item instance
