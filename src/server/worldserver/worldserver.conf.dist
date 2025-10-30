@@ -3267,9 +3267,32 @@ loading.itemspecload      = 1
 
 ###################################################################################################
 # security settings
-
-BattlePay.Security                      = 0
+#
+#    BattlePay.Enable
+#        Description: Enable/Disable Battle Pay store
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+#    BattlePay.Currency
+#        Description: Сurrency used for store
+#        Default:     0		Unknow	未指定 
+#					  1 	Usd		美元USD			United States Dollar
+#					  2		Gbp		英镑GBP			Great Britain Pound
+#					  3		Krw		韩元KRW			Korean Won
+#					  4		Eur		欧元EUR			Euro
+#					  5		Rub		卢布RUB			Russian Ruble
+#					  8		Ars		阿根廷比索ARS	Argentine Peso
+#					  9		CLP		智利比索CLP		Chilean Peso
+#  					  10	Mxn		墨西哥比索MXN	Mexican Peso
+#					  11	Brl		巴西雷亚尔BRL	Brazilian Real
+#					  12	Aud		澳元AUD			Australian Dollar
+#					  14	Cpt		战网点数		Blizzard BattlePoints
+#					  15	Tpt		时光徽章		WoW Token
+#					  16	Beta	测试币			TEST
+#
 BattlePay.Enable                        = 1
+BattlePay.Currency                      = 14
+BattlePay.Security                      = 0
 Security.MustHaveAuthenticatorAccess    = 0
 ###################################################################################################
 

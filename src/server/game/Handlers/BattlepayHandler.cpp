@@ -84,7 +84,6 @@ void WorldSession::HandleBattlePayStartPurchase(WorldPacket& p_RecvData)
     /// Query balance to database
     PreparedStatement* l_Statement = WebDatabase.GetPreparedStatement(WEB_SEL_ACCOUNT_POINTS);
     l_Statement->setUInt32(0, GetAccountId());
-    l_Statement->setUInt32(1, GetAccountId());
 
     uint32 l_AccountId = GetAccountId();
 
@@ -105,7 +104,8 @@ void WorldSession::HandleBattlePayStartPurchase(WorldPacket& p_RecvData)
 
         /// Check balance
         Field* l_Fields = p_Result->Fetch();
-        if (std::atoi(l_Fields[0].GetCString()) < (int64)l_Purchase->CurrentPrice)
+        uint32 points = l_Fields[0].GetUInt32();
+        if (points < (uint32)l_Purchase->CurrentPrice)
         {
             Battlepay::PacketFactory::SendStartPurchaseResponse(l_Session, *l_Purchase, Battlepay::PacketFactory::Error::InsufficientBalance);
             return;
@@ -207,7 +207,6 @@ void WorldSession::HandleBattlePayConfirmPurchase(WorldPacket& p_RecvData)
     /// Double balance check, because the balance can change since the user click on "Buy now"
     PreparedStatement* l_Statement = WebDatabase.GetPreparedStatement(WEB_SEL_ACCOUNT_POINTS);
     l_Statement->setUInt32(0, GetAccountId());
-    l_Statement->setUInt32(1, GetAccountId());
 
     uint32 l_AccountId = GetAccountId();
 
@@ -223,7 +222,8 @@ void WorldSession::HandleBattlePayConfirmPurchase(WorldPacket& p_RecvData)
 
         /// Check balance
         Field* l_Fields = p_Result->Fetch();
-        if (std::atoi(l_Fields[0].GetCString()) < (int64)l_Purchase->CurrentPrice)
+        uint32 points = l_Fields[0].GetUInt32();
+        if (points < (uint32)l_Purchase->CurrentPrice)
             return;
 
         /// Custom check (scripts)

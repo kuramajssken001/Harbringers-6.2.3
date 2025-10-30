@@ -240,12 +240,7 @@ namespace Battlepay
             /*
             * Called by sql prepare statement callback
             */
-            void OnPrepareStatementCallbackEvent(WorldSession* p_Session, uint8 p_CallbackEvent);
 
-            /*
-            * Deliver purchases to user
-            * e.g. : items, premades, golds, services ...etc
-            */
             void ProcessDelivery(WorldSession* p_Session, Battlepay::Purchase* p_Purchase);
 
             /*

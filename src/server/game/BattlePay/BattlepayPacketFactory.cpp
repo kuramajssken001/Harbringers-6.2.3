@@ -341,7 +341,6 @@ namespace Battlepay
 
             PreparedStatement* l_Statement = WebDatabase.GetPreparedStatement(WEB_SEL_ACCOUNT_POINTS);
             l_Statement->setUInt32(0, p_Session->GetAccountId());
-            l_Statement->setUInt32(1, p_Session->GetAccountId());
 
             AsyncQuery(WebDatabase, l_Statement, [l_SessionId](PreparedQueryResult p_Result) -> void
             {
@@ -353,18 +352,49 @@ namespace Battlepay
                 if (p_Result)
                 {
                     Field* l_Fields = p_Result->Fetch();
-                    if (char const* l_BalanceTxt = l_Fields[0].GetCString())
-                        l_Balance = atoi(l_BalanceTxt);
+                    l_Balance = l_Fields[0].GetUInt32();
                 }
 
                 Player* l_Player = l_Session->GetPlayer();
                 if (l_Player == nullptr)
                     return;
 
-                std::ostringstream l_Data;
-                l_Data << l_Balance;
-                l_Player->SendCustomMessage(GetCustomMessage(CustomMessage::AshranStoreBalance), l_Data);
+                ChatHandler(l_Player->GetSession()).PSendSysMessage("You account points %u", l_Balance);
             });
+        }
+        void UpdateAccountPoints(WorldSession* p_Session, uint32 points)
+        {
+            if (!sWorld->getBoolConfig(CONFIG_WEB_DATABASE_ENABLE))
+                return;
+
+            uint32 l_SessionId = p_Session->GetAccountId();
+
+            PreparedStatement* stmt = WebDatabase.GetPreparedStatement(WEB_UDP_ACCOUNT_POINTS);
+            stmt->setUInt32(0, points);
+            stmt->setUInt32(1, p_Session->GetAccountId());
+
+            AsyncQuery(WebDatabase, stmt, [l_SessionId](PreparedQueryResult p_Result) -> void
+                {
+                    WorldSession* l_Session = sWorld->FindSession(l_SessionId);
+                    if (l_Session == nullptr)
+                        return;
+
+                    uint32 l_Balance = 0;
+                    if (p_Result)
+                    {
+                        Field* l_Fields = p_Result->Fetch();
+                        if (char const* l_BalanceTxt = l_Fields[0].GetCString())
+                            l_Balance = atoi(l_BalanceTxt);
+                    }
+
+                    Player* l_Player = l_Session->GetPlayer();
+                    if (l_Player == nullptr)
+                        return;
+
+                    std::ostringstream l_Data;
+                    l_Data << l_Balance;
+                    l_Player->SendCustomMessage(GetCustomMessage(CustomMessage::AshranStoreBalance), l_Data);
+                });
 
             if (Player* l_Player = p_Session->GetPlayer())
             {

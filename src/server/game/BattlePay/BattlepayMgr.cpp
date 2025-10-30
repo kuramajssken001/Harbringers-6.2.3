@@ -251,7 +251,8 @@ namespace Battlepay
     {
         /// Krw is the battle coins on retail
         /// @TODO: Move that to config files
-        return ShopCurrency::Krw;
+        int32 CurrencyType = ConfigMgr::GetIntDefault("BattlePay.Currency", ShopCurrency::Usd);
+        return static_cast<ShopCurrency>(CurrencyType);
     }
 
     bool Manager::IsAvailable(WorldSession* p_Session) const
@@ -274,26 +275,11 @@ namespace Battlepay
         l_Statement->setUInt32(4, 1);
         l_Statement->setUInt32(5, p_Purchase->CurrentPrice);
         l_Statement->setString(6, p_Session->GetRemoteAddress());
+        WebDatabase.AsyncQuery(l_Statement);
 
         uint32 l_SessionID = p_Session->GetAccountId();
-
-        AsyncQuery(WebDatabase, l_Statement, [l_SessionID](PreparedQueryResult p_Result) -> void
-        {
-            if (WorldSession* l_Session = sWorld->FindSession(l_SessionID))
-                sBattlepayMgr->OnPrepareStatementCallbackEvent(l_Session, CallbackEvent::SavePurchase);
-        });
-    }
-
-    void Manager::OnPrepareStatementCallbackEvent(WorldSession* p_Session, uint8 p_CallbackEvent)
-    {
-        switch (p_CallbackEvent)
-        {
-            case Battlepay::CallbackEvent::SavePurchase:
-                Battlepay::PacketFactory::SendPointsBalance(p_Session);
-                break;
-            default:
-                break;
-        }
+        uint32 DeductionPoints = (uint32)p_Purchase->CurrentPrice;
+        Battlepay::PacketFactory::UpdateAccountPoints(p_Session, DeductionPoints);
     }
 
     void Manager::ProcessDelivery(WorldSession* p_Session, Battlepay::Purchase* p_Purchase)

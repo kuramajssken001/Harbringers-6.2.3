@@ -142,6 +142,8 @@ namespace Battlepay
         * @param p_Session  : Packet will be sent to that WorldSession
         */
         void SendPointsBalance(WorldSession* p_Session);
+
+        void UpdateAccountPoints(WorldSession* p_Session, uint32 points);
     }
 }
 
