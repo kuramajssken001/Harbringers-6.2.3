@@ -3001,70 +3001,82 @@ public:
 /// Call by Sinister Strike - 1752
 class spell_rog_bandits_guile : public SpellScriptLoader
 {
-    public:
-        spell_rog_bandits_guile() : SpellScriptLoader("spell_rog_bandits_guile") { }
+public:
+    spell_rog_bandits_guile() : SpellScriptLoader("spell_rog_bandits_guile") {}
 
-        class spell_rog_bandits_guile_SpellScript : public SpellScript
+    class spell_rog_bandits_guile_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_rog_bandits_guile_SpellScript);
+
+        enum eSpells
         {
-            PrepareSpellScript(spell_rog_bandits_guile_SpellScript);
-
-            enum eSpells
-            {
-                ShallowInsight  = 84745, //< Green
-                ModerateInsight = 84746, //< Yellow
-                DeepInsight     = 84747  //< Red
-            };
-
-            void HandleOnHit()
-            {
-                Unit* l_Caster = GetCaster();
-
-                l_Caster->SetInsightCount(l_Caster->GetInsightCount() + 1);
-
-                /// it takes a total of 4 strikes to get a proc, or a level up
-                if (l_Caster->GetInsightCount() < 4)
-                {
-                    /// Each strike refresh the duration of Shallow Insight or Moderate Insight
-                    /// but you can't refresh Deep Insight without starting from Shallow Insight.
-                    if (Aura* l_ShallowInsight = l_Caster->GetAura(eSpells::ShallowInsight))
-                        l_ShallowInsight->RefreshDuration();
-                    else if (Aura* l_ModerateInsight = l_Caster->GetAura(eSpells::ModerateInsight))
-                        l_ModerateInsight->RefreshDuration();
-                }
-                else
-                {
-                    l_Caster->SetInsightCount(0);
-
-                    /// it takes 4 strikes to get Shallow Insight
-                    /// then 4 strikes to get Moderate Insight
-                    /// and then 4 strikes to get Deep Insight
-
-                    if (Aura* l_ShallowInsight = l_Caster->GetAura(eSpells::ShallowInsight))
-                    {
-                        l_ShallowInsight->Remove();
-                        l_Caster->CastSpell(l_Caster, eSpells::ModerateInsight, true);
-                    }
-                    else if (Aura* l_ModerateInsight = l_Caster->GetAura(eSpells::ModerateInsight))
-                    {
-                        l_ModerateInsight->Remove();
-                        l_Caster->CastSpell(l_Caster, eSpells::DeepInsight, true);
-                    }
-                    else if (!l_Caster->HasAura(eSpells::DeepInsight))
-                        l_Caster->CastSpell(l_Caster, eSpells::ShallowInsight, true);
-                }
-            }
-
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_rog_bandits_guile_SpellScript::HandleOnHit);
-            }
+            ShallowInsight = 84745, //< Green
+            ModerateInsight = 84746, //< Yellow
+            DeepInsight = 84747, //< Red
+            BanditsGuilePassive = 84654  //< Talent/passive learned check
         };
 
-        SpellScript* GetSpellScript() const
+        void HandleOnHit()
         {
-            return new spell_rog_bandits_guile_SpellScript();
+            Unit* l_Caster = GetCaster();
+            if (!l_Caster)
+                return;
+
+            Player* l_Player = l_Caster->ToPlayer();
+            if (!l_Player)
+                return;
+
+            // Only active if the Rogue has learned Bandit's Guile (84654)
+            if (!l_Player->HasSpell(eSpells::BanditsGuilePassive))
+                return;
+
+            l_Caster->SetInsightCount(l_Caster->GetInsightCount() + 1);
+
+            /// it takes a total of 4 strikes to get a proc, or a level up
+            if (l_Caster->GetInsightCount() < 4)
+            {
+                /// Each strike refresh the duration of Shallow Insight or Moderate Insight
+                /// but you can't refresh Deep Insight without starting from Shallow Insight.
+                if (Aura* l_ShallowInsight = l_Caster->GetAura(eSpells::ShallowInsight))
+                    l_ShallowInsight->RefreshDuration();
+                else if (Aura* l_ModerateInsight = l_Caster->GetAura(eSpells::ModerateInsight))
+                    l_ModerateInsight->RefreshDuration();
+            }
+            else
+            {
+                l_Caster->SetInsightCount(0);
+
+                /// it takes 4 strikes to get Shallow Insight
+                /// then 4 strikes to get Moderate Insight
+                /// and then 4 strikes to get Deep Insight
+
+                if (Aura* l_ShallowInsight = l_Caster->GetAura(eSpells::ShallowInsight))
+                {
+                    l_ShallowInsight->Remove();
+                    l_Caster->CastSpell(l_Caster, eSpells::ModerateInsight, true);
+                }
+                else if (Aura* l_ModerateInsight = l_Caster->GetAura(eSpells::ModerateInsight))
+                {
+                    l_ModerateInsight->Remove();
+                    l_Caster->CastSpell(l_Caster, eSpells::DeepInsight, true);
+                }
+                else if (!l_Caster->HasAura(eSpells::DeepInsight))
+                    l_Caster->CastSpell(l_Caster, eSpells::ShallowInsight, true);
+            }
         }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_rog_bandits_guile_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_rog_bandits_guile_SpellScript();
+    }
 };
+
 
 /// Deep Insight - 84747
 class spell_rog_deep_insight : public SpellScriptLoader
