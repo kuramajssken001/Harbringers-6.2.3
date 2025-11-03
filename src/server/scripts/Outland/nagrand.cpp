@@ -693,8 +693,10 @@ void AddSC_nagrand()
     new npc_maghar_captive();
     new npc_creditmarker_visit_with_ancestors();
     new npc_corki();
-    new go_corkis_prison();
     new npc_kurenai_captive();
+
+	/// Object
+	new go_corkis_prison();
     new go_warmaul_prison();
 }
 #endif

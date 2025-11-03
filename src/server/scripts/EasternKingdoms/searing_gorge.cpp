@@ -256,6 +256,45 @@ public:
 	}
 };
 
+/// Consecrated Tripetricine - 88547
+class spell_consecrated_tripetricine : public SpellScriptLoader
+{
+public:
+	spell_consecrated_tripetricine() : SpellScriptLoader("spell_consecrated_tripetricine") { }
+
+	enum Id
+	{
+		// Npc
+		NPC_ARCHDUKE_CALCINDER = 47462
+	};
+
+	class spell_consecrated_tripetricine_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_consecrated_tripetricine_SpellScript);
+
+		SpellCastResult CheckCast()
+		{
+			if (Creature* archdukeCalcinder = GetCaster()->FindNearestCreature(NPC_ARCHDUKE_CALCINDER, 20.0f))
+			{
+				// Allow cast only if Calcinder HP are under of equal to 50%!
+				if (archdukeCalcinder->GetHealthPct() <= 50)
+					return SPELL_CAST_OK;
+			}
+			return SPELL_FAILED_TARGET_AURASTATE;
+		}
+
+		void Register()
+		{
+			OnCheckCast += SpellCheckCastFn(spell_consecrated_tripetricine_SpellScript::CheckCast);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_consecrated_tripetricine_SpellScript();
+	}
+};
+
 
 void AddSC_searing_gorge()
 {
@@ -265,4 +304,6 @@ void AddSC_searing_gorge()
 	new go_altar_of_suntara();
 
 
+	/// Spells
+	new spell_consecrated_tripetricine();
 }

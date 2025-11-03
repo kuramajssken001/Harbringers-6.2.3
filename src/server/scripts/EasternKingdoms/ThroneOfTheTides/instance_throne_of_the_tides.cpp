@@ -179,6 +179,19 @@ public:
             }
         }
 
+        void OnGameObjectRemove(GameObject* pGo)
+		{
+			switch (pGo->GetEntry())
+			{
+			case GO_LADY_NAZJAR_DOOR:
+			case GO_COMMANDER_ULTHOK_DOOR:
+			case GO_ERUNAK_STONESPEAKER_DOOR:
+			case GO_OZUMAT_DOOR:
+				AddDoor(pGo, false);
+				break;
+			}
+		}
+
         void SetData(uint32 type, uint32 data)
         {
             switch (type)

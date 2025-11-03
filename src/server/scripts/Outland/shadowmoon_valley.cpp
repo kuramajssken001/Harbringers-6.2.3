@@ -2080,12 +2080,16 @@ void AddSC_shadowmoon_valley()
     new npc_overlord_morghor();
     new npc_earthmender_wilda();
     new npc_lord_illidan_stormrage();
-    new go_crystal_prison();
     new mob_illidari_spawn();
     new mob_torloth_the_magnificent();
     new npc_enraged_spirit();
-    new spell_unlocking_zuluheds_chains();
     new npc_shadowmoon_tuber_node();
     new mob_collidus_the_warp_watcher();
+
+	/// Spell
+	new spell_unlocking_zuluheds_chains();
+
+	/// Object
+	new go_crystal_prison();
 }
 #endif
