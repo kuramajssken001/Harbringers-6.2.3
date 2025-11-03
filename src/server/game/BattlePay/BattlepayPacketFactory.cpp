@@ -369,7 +369,7 @@ namespace Battlepay
 
             uint32 l_SessionId = p_Session->GetAccountId();
 
-            PreparedStatement* stmt = WebDatabase.GetPreparedStatement(WEB_UDP_ACCOUNT_POINTS);
+            PreparedStatement* stmt = WebDatabase.GetPreparedStatement(WEB_UPD_ACCOUNT_POINTS);
             stmt->setUInt32(0, points);
             stmt->setUInt32(1, p_Session->GetAccountId());
 
