@@ -261,7 +261,6 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
     // Logging
     index = 0;
     PreparedStatement* stmt_log = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL_LOG);
-    stmt_log->setUInt32(index++, mailId);
     stmt_log->setUInt8 (index++, uint8(sender.GetMailMessageType()));
     stmt_log->setInt8  (index++, int8(sender.GetStationery()));
     stmt_log->setUInt16(index++, GetMailTemplateId());
