@@ -1153,7 +1153,7 @@ void Creature::SetLootRecipient(Unit* unit)
         return;
     }
 
-    if (unit->GetTypeId() != TYPEID_PLAYER && !unit->IsVehicle())
+    if (!unit->IsPlayer() && !unit->IsVehicle() && !unit->isPet())
         return;
 
     Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself();
