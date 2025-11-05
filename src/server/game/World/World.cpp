@@ -1460,9 +1460,6 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_LOG_PACKETS] = ConfigMgr::GetBoolDefault("LogPackets", true);
     m_bool_configs[CONFIG_WEB_DATABASE_ENABLE] = ConfigMgr::GetBoolDefault("WebDatabase.enable", false);
 
-
-    m_bool_configs[CONFIG_LOG_PACKETS] = ConfigMgr::GetBoolDefault("LogPackets", true);
-
     // Specialization check at spell cast (as it may breaks spells)
     m_bool_configs[CONFIG_DISABLE_SPELL_SPECIALIZATION_CHECK] = ConfigMgr::GetBoolDefault("DisableSpellSpecializationCheck", false);
 
