@@ -23282,3 +23282,33 @@ bool Unit::CanMoveDuringCast() const
 
 	return false;
 }
+
+void Unit::CastWithDelay(uint32 delay, Unit* victim, uint32 spellid, bool triggered, bool repeat)
+{
+    class CastDelayEvent : public BasicEvent
+    {
+    public:
+        CastDelayEvent(Unit* _me, uint64 _victimGuid, uint32 const& _spellId, bool const& _triggered, bool const& _repeat, uint32 const& _delay) :
+            me(_me), victimGuid(_victimGuid), spellId(_spellId), triggered(_triggered), repeat(_repeat), delay(_delay) {
+        }
+
+        bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+        {
+            Unit* victim = ObjectAccessor::GetUnit(*me, victimGuid);
+            me->CastSpell(victim, spellId, triggered);
+            if (repeat)
+                me->CastWithDelay(delay, victim, spellId, triggered, repeat);
+            return true;
+        }
+
+    private:
+        Unit* me;
+        uint64 victimGuid;
+        uint32 const spellId;
+        uint32 const delay;
+        bool const triggered;
+        bool const repeat;
+    };
+
+    m_Events.AddEvent(new CastDelayEvent(this, victim ? victim->GetGUID() : 0, spellid, triggered, repeat, delay), m_Events.CalculateTime(delay));
+}

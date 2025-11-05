@@ -63,7 +63,8 @@ enum Events
 
 enum Actions
 {
-    ACTION_GHURSHA_START    = 1
+    ACTION_GHURSHA_START    = 1,
+    ACTION_RESET            = 2
 };
 
 enum Adds
@@ -113,8 +114,13 @@ class boss_erunak_stonespeaker : public CreatureScript
                 events.Reset();
                 summons.DespawnAll();
                 if (pInstance)
+                {
                     if (pInstance->GetBossState(DATA_MINDBENDER_GHURSHA) == DONE || bPhase)
                         me->setFaction(35);
+
+                    if (Creature* pOzuma = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_OZUMAT)))
+                        pOzuma->AI()->DoAction(ACTION_RESET);
+                }
             }
 
             void KilledUnit(Unit* /*victim*/)

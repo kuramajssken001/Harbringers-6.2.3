@@ -49,7 +49,7 @@ Position const g_DrakePointB = {1636.19f, 2079.83f, 137.453f};
 
 #define g_DrakeDisplay 55447
 #define g_TovraDisplay 55630
-float g_DrakeOrientationWhileFlightIntro = 1.524283;
+float g_DrakeOrientationWhileFlightIntro = 1.524283f;
 
 /// SkyLord Torva - 80005
 class boss_skylord_torva : public CreatureScript

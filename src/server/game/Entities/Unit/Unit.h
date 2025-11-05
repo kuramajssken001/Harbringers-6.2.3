@@ -428,7 +428,9 @@ enum UnitModifierType
     BASE_PCT                = 2,
     TOTAL_VALUE             = 3,
     TOTAL_PCT               = 4,
-    MODIFIER_TYPE_END       = 5
+    MODIFIER_TYPE_END       = 5,
+    UNIT_MODIFIER_TYPE_FLAT = 6,
+    UNIT_MODIFIER_TYPE_PCT = 7
 };
 
 enum WeaponDamageRange
@@ -507,6 +509,7 @@ enum UnitMods
     UNIT_MOD_DAMAGE_MAINHAND,
     UNIT_MOD_DAMAGE_OFFHAND,
     UNIT_MOD_DAMAGE_RANGED,
+	UNIT_MOD_HEALING_DONE_POSITIVE,
     UNIT_MOD_BONUS_ARMOR,
     UNIT_MOD_END,
     // synonyms
@@ -1926,6 +1929,8 @@ class Unit : public WorldObject
         void CastSpell(GameObject* go, uint32 spellId, bool triggered, Item* castItem = NULL, AuraEffect* triggeredByAura = nullptr, uint64 originalCaster = 0);
         void CastSpell(Item* p_ItemTarget, uint32 p_SpellID, bool p_Triggered, Item* p_CastItem = nullptr, AuraEffect* p_TriggeredByAura = nullptr, uint64 p_OriginalCaster = 0);
 
+        void CastWithDelay(uint32 delay, Unit* victim, uint32 spellid, bool triggered = false, bool repeat = false);
+        
         void CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem= NULL, AuraEffect const* triggeredByAura = nullptr, uint64 originalCaster = 0);
         void CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, int32 const* bp3, int32 const* bp4, int32 const* bp5, bool triggered, Item* castItem= NULL, AuraEffect const* triggeredByAura = nullptr, uint64 originalCaster = 0);
         void CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* Victim = NULL, bool triggered = true, Item* castItem = NULL, AuraEffect const* triggeredByAura = nullptr, uint64 originalCaster = 0);
@@ -2269,7 +2274,14 @@ class Unit : public WorldObject
         // delayed+channeled spells are always interrupted
         void InterruptNonMeleeSpells(bool withDelayed, uint32 spellid = 0, bool withInstant = true);
         void InterruptNonMeleeSpellsExcept(bool withDelayed, uint32 except, bool withInstant = true);
-
+        // Add this method to the Unit class definition (public section)
+        void ApplyStatPctModifier(UnitMods unitMod, float pct, bool apply)
+        {
+            // This is a typical implementation for stat percent modification
+            // You may need to adjust the internals to match your stat system
+            float value = apply ? pct : -pct;
+            HandleStatModifier(unitMod, UNIT_MODIFIER_TYPE_PCT, value, apply);
+        }
         Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
         Spell* GetCurrentSpell(uint32 spellType) const { return m_currentSpells[spellType]; }
         Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;

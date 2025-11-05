@@ -91,7 +91,8 @@ enum Adds
 enum Actions
 {
     ACTION_NEPTULON_START_EVENT = 1,
-    ACTION_NEPTULON_START       = 2
+    ACTION_NEPTULON_START       = 2,
+    ACTION_RESET                = 3
 };
 
 enum Achievement
@@ -244,7 +245,6 @@ class npc_neptulon : public CreatureScript
                 {
                     // Achievement
                     pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_KILL_OZUMAT, 0, 0, me);
-                    
                     pInstance->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, SPELL_ENCOUNTER_COMPLETE, me);
                     pInstance->SetBossState(DATA_OZUMAT, DONE);
                 }
