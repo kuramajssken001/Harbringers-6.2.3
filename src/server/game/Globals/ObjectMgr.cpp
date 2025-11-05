@@ -36,6 +36,7 @@
 #include "PoolMgr.h"
 #include "DB2Structure.h"
 #include "DB2Stores.h"
+#include "ResearchSiteIndex.h"
 #include "Configuration/Config.h"
 #include "VMapFactory.h"
 #ifndef CROSS
@@ -10298,35 +10299,35 @@ void ObjectMgr::LoadResearchSiteZones()
 {
 	uint32 l_OldMSTime = getMSTime();
 
-	for (auto itr : sResearchSiteSet)
+	if (poiPointsById.empty())
+		BuildPOIPointsIndex();
+	if (zoneLevelMap.empty())
+		BuildZoneLevelIndex();
+
+	for (ResearchSiteEntry const* site : sResearchSiteSet)
 	{
-		for (uint32 i = 0; i < sQuestPOIPointStore.GetNumRows(); ++i)
+		auto range = poiPointsById.equal_range(site->POIid);
+		if (range.first == range.second)
+			continue;
+
+		ResearchZoneEntry& zone = _researchZoneMap[site->ID];
+		zone.coords.reserve(std::distance(range.first, range.second));
+
+		for (auto it = range.first; it != range.second; ++it)
 		{
-			if (QuestPOIPointEntry const* POI = sQuestPOIPointStore.LookupEntry(i))
-			{
-				if (POI->ID != itr->POIid)
-					continue;
-
-				ResearchZoneEntry &ptr = _researchZoneMap[itr->ID];
-				ptr.coords.push_back(ResearchPOIPoint(POI->x, POI->y));
-				ptr.map = itr->mapId;
-				ptr.zone = sMapMgr->GetZoneId(ptr.map, POI->x, POI->y, 0.0f);
-				ptr.level = 0;
-
-				for (uint32 i = 0; i < sAreaStore.GetNumRows(); ++i)
-				{
-					AreaTableEntry const* area = sAreaStore.LookupEntry(i);
-					if (!area)
-						continue;
-
-					if (area->ContinentID == ptr.map && area->ParentAreaID == ptr.zone)
-					{
-						ptr.level = area->ExplorationLevel;
-						break;
-					}
-				}
-			}
+			QuestPOIPointEntry const* poi = it->second;
+			zone.coords.emplace_back(poi->x, poi->y);
 		}
+
+		QuestPOIPointEntry const* firstPoi = range.first->second;
+		zone.map = site->mapId;
+		zone.zone = sMapMgr->GetZoneId(zone.map, firstPoi->x, firstPoi->y, 0.0f);
+		zone.level = 0;
+
+		MapZoneKey key{ zone.map, zone.zone };
+		auto lvlIt = zoneLevelMap.find(key);
+		if (lvlIt != zoneLevelMap.end())
+			zone.level = lvlIt->second;
 	}
 
 	sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %lu Archeology research site zones in %u ms.", (unsigned long)sResearchSiteSet.size(), GetMSTimeDiffToNow(l_OldMSTime));

@@ -32,6 +32,7 @@
 #include <functional>
 #include "PhaseMgr.h"
 #include <ace/Thread_Mutex.h>
+#include "ResearchSiteIndex.h"
 #include <unordered_set>
 
 class Item;
