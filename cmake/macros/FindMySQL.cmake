@@ -72,14 +72,17 @@ find_path(MYSQL_INCLUDE_DIR
     /usr/local/include
     /usr/local/include/mysql
     /usr/local/mysql/include
+	"C:/Program Files/MySQL/MySQL Server 8.0/include"
     "C:/Program Files/MySQL/MySQL Server 5.7/include"
     "C:/Program Files/MySQL/MySQL Server 5.6/include"
     "C:/Program Files/MySQL/MySQL Server 5.5/include"
     "C:/Program Files/MySQL/include"
     "C:/MySQL/include"
+	"[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 8.0;Location]/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.6;Location]/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.5;Location]/include"
+	"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 8.0;Location]/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.7;Location]/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.6;Location]/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.5;Location]/include"
@@ -113,17 +116,23 @@ if( WIN32 )
       libmysql
     PATHS
       ${MYSQL_ADD_LIBRARIES_PATH}
+	  "C:/Program Files/MySQL/MySQL Server 8.0/lib/opt"
       "C:/Program Files/MySQL/MySQL Server 5.7/lib/opt"
       "C:/Program Files/MySQL/MySQL Server 5.6/lib/opt"
       "C:/Program Files/MySQL/MySQL Server 5.5/lib/opt"
       "C:/Program Files/MySQL/lib"
       "C:/MySQL/lib/debug"
+	  "C:/MySQL/lib"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 8.0;Location]/lib"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 8.0;Location]/lib/opt"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/lib"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/lib/opt"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.6;Location]/lib"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.6;Location]/lib/opt"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.5;Location]/lib"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.5;Location]/lib/opt"
+	  "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 8.0;Location]/lib"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 8.0;Location]/lib/opt"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.7;Location]/lib"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.7;Location]/lib/opt"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.6;Location]/lib"
