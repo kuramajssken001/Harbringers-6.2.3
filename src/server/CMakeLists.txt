@@ -17,7 +17,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 if( SERVERS )
-  set(sources_Debugging
+  set(sources_windows_Debugging
     ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging/WheatyExceptionReport.cpp
     ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging/WheatyExceptionReport.h
   )
@@ -30,5 +30,6 @@ if( SERVERS )
 else()
   if( TOOLS )
     add_subdirectory(collision)
+	add_subdirectory(shared)
   endif()
 endif()

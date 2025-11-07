@@ -1488,11 +1488,11 @@ void SpellMgr::LoadSpellRanks()
     }
     mSpellChains.clear();
     //                                                     0             1      2
-    QueryResult result = WorldDatabase.Query("SELECT first_spell_id, spell_id, rank from spell_ranks ORDER BY first_spell_id, rank");
+    QueryResult result = WorldDatabase.Query("SELECT `first_spell_id`, `spell_id`, `rank` FROM `spell_ranks` ORDER BY first_spell_id, `rank`");
 
     if (!result)
     {
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 spell rank records. DB table `spell_ranks` is empty.");
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 spell `rank` records. DB table `spell_ranks` is empty.");
 
         return;
     }

@@ -18,7 +18,7 @@
     # include <ppl.h>
 # endif
 
-typedef ACE_TSS<CRandomSFMT> SFMTRandTSS;
+typedef ACE_TSS<SFMTRand> SFMTRandTSS;
 static SFMTRandTSS sfmtRand;
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -142,6 +142,15 @@ nullable_string PackDBBinary(void const* unpackedData, uint32 unpackedCount)
     return nullable_string((char const*)unpackedData, unpackedCount);
 }
 
+struct tm* localtime_r(const time_t* time, struct tm *result)
+{
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+    localtime_s(result, time);
+    return result;
+#else
+    return localtime_r(&time, &result); // POSIX
+#endif
+}
 
 std::string secsToTimeString(uint64 timeInSecs, bool shortText, bool hoursOnly)
 {
@@ -200,7 +209,8 @@ uint32 TimeStringToSecs(const std::string& timestring)
 
 std::string TimeToTimestampStr(time_t t)
 {
-    tm* aTm = localtime(&t);
+    tm aTm;
+    localtime_r(&t, &aTm);
     //       YYYY   year
     //       MM     month (2 digits 01-12)
     //       DD     day (2 digits 01-31)
@@ -208,7 +218,7 @@ std::string TimeToTimestampStr(time_t t)
     //       MM     minutes (2 digits 00-59)
     //       SS     seconds (2 digits 00-59)
     char buf[20];
-    snprintf(buf, 20, "%04d-%02d-%02d_%02d-%02d-%02d", aTm->tm_year+1900, aTm->tm_mon+1, aTm->tm_mday, aTm->tm_hour, aTm->tm_min, aTm->tm_sec);
+    snprintf(buf, 20, "%04d-%02d-%02d_%02d-%02d-%02d", aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
     return std::string(buf);
 }
 

@@ -138,7 +138,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
 
     PREPARE_STATEMENT(LOGIN_RPL_CHARACTER_RENDERER_QUEUE, "REPLACE INTO character_renderer_queue (guid, race, gender, class, skinColor, face, hairStyle, hairColor, facialHair, equipment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
 
-    PREPARE_STATEMENT(LOGIN_SEL_ACTIVITY, "SELECT CONCAT(WEEK(DATE), ' - ', DATE_FORMAT(DATE, '%Y')) AS `week`, COUNT(DISTINCT(DATE_FORMAT(DATE, '%y - %m - %d'))) `countperweek` FROM account_log_ip WHERE accountid = ? AND source > 1 AND error = 0 GROUP BY CONCAT(WEEK(DATE), ' - ', DATE_FORMAT(DATE, '%y')) ORDER BY DATE", CONNECTION_SYNCH);
+    PREPARE_STATEMENT(LOGIN_SEL_ACTIVITY, "SELECT CONCAT(WEEK(`DATE`), ' - ', DATE_FORMAT(`DATE`, '%Y')) AS `week`, COUNT(DISTINCT DATE_FORMAT(`DATE`, '%Y-%m-%d')) AS `countperweek` FROM account_log_ip WHERE accountid = ? AND  source > 1 AND  error = 0 GROUP  BY CONCAT(WEEK(`DATE`), ' - ', DATE_FORMAT(`DATE`, '%Y')) ORDER  BY MIN(`DATE`)", CONNECTION_SYNCH);
     PREPARE_STATEMENT(LOGIN_SEL_ACC_LOYALTY, "SELECT LastClaim, LastEventReset FROM account_loyalty WHERE AccountID = ?", CONNECTION_SYNCH)
     PREPARE_STATEMENT(LOGIN_REP_ACC_LOYALTY, "REPLACE INTO account_loyalty(AccountID, LastClaim, LastEventReset) VALUES (?, ?, ?)", CONNECTION_ASYNC)
     PREPARE_STATEMENT(LOGIN_SEL_ACC_LOYALTY_EVENT, "SELECT Event, Count FROM account_loyalty_event WHERE AccountID = ?", CONNECTION_SYNCH)
