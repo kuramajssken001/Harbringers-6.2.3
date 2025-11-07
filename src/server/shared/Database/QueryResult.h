@@ -9,6 +9,8 @@
 #ifndef QUERYRESULT_H
 #define QUERYRESULT_H
 
+#include "AutoPtr.h"
+#include <ace/Thread_Mutex.h>
 #include <memory>
 #include "Field.h"
 #include "Errors.h"
@@ -85,7 +87,7 @@ class PreparedResultSet
         MYSQL_STMT* m_stmt;
         MYSQL_RES* m_metadataResult;    ///< Field metadata, returned by mysql_stmt_result_metadata
 
-        my_bool* m_isNull;
+        bool* m_isNull;
         unsigned long* m_length;
 
         void CleanUp();
