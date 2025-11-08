@@ -1,6 +1,6 @@
 DELETE FROM `item_template` WHERE entry=200301;
 INSERT INTO `item_template` (`entry`, `class`, `subclass`, `name`, `Quality`, `spellid_1`, `spellid_2`) VALUES (200301, 0, 0, 'ItemGossip', 5, 18282, 0);
-DELETE FROM `item_script_names` WHERE entry = 200301;
+DELETE FROM `item_script_names` WHERE Id = 200301;
 INSERT INTO `item_script_names` (`Id`, `ScriptName`) VALUES (200301, 'multi_item');
 
 DROP TABLE IF EXISTS `_multi_item`;
