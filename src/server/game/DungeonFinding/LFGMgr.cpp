@@ -1165,6 +1165,65 @@ bool LFGMgr::CheckCompatibility(LfgGuidList p_Check, LfgProposal*& p_Proposal, L
     if (p_Proposal)                                         // Do not check anything if we already have a proposal
         return false;
 
+    if (p_Check.size() == 1 && IS_PLAYER_GUID(p_Check.front()))
+    {
+        uint64 guid = p_Check.front();
+
+        // 获取玩家
+        Player* player = ObjectAccessor::FindPlayer(guid);
+        if (!player)
+            return false;
+
+        // 获取玩家队列信息
+        LfgQueueInfoMap::iterator itQueue = m_QueueInfoMap.find(guid);
+        if (itQueue == m_QueueInfoMap.end() || itQueue->second->dungeons.empty())
+            return false;
+
+        // 随机选一个副本
+        uint32 dungeonId = *itQueue->second->dungeons.begin();
+
+        // 创建 Proposal
+        p_Proposal = new LfgProposal(dungeonId);
+        p_Proposal->cancelTime = time_t(time(nullptr)) + LFG_TIME_PROPOSAL;
+        p_Proposal->state = LFG_PROPOSAL_SUCCESS; // 直接成功
+        p_Proposal->queues = p_Check;
+        p_Proposal->groupLowGuid = 0;
+        p_Proposal->leader = guid;
+
+        // 添加玩家
+        LfgProposalPlayer* ppPlayer = new LfgProposalPlayer();
+        ppPlayer->role = itQueue->second->roles.begin()->second;
+        ppPlayer->accept = LFG_ANSWER_AGREE;
+        p_Proposal->players[guid] = ppPlayer;
+
+        if (p_Proposal && p_Proposal->state == LFG_PROPOSAL_SUCCESS)
+        {
+            // 模拟所有人已接受
+            for (auto& pair : p_Proposal->players)
+                pair.second->accept = LFG_ANSWER_AGREE;
+
+            uint32 dungeonId = p_Proposal->dungeonId;
+            uint64 grpGuid = 0;
+
+            Player* player = ObjectAccessor::FindPlayer(p_Check.front());
+            if (player)
+            {
+                if (Group* grp = player->GetGroup())
+                    grpGuid = grp->GetGUID();
+                else
+                    grpGuid = player->GetGUID();   // 单人时用玩家 GUID 临时充当“组”GUID
+
+                SetDungeon(grpGuid, dungeonId);
+                SetState(grpGuid, LFG_STATE_PROPOSAL);
+            }
+
+            // 立即触发进本（不等待投票）
+            UpdateProposal(p_Proposal->dungeonId, guid, true); // 这会触发进本逻辑
+        }
+
+        return true;
+    }
+
     uint8 l_MaxGroupSize = 5;
     if (p_Categorie == LFG_CATEGORIE_RAID)
         l_MaxGroupSize = 25;
@@ -2225,7 +2284,7 @@ void LFGMgr::TeleportPlayer(Player* player, bool out, bool fromOpcode /*= false*
     if (grp)
     {
         LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(GetDungeon(grp->GetGUID()));
-        sLog->outAshran("LFGMgr::TeleportPlayer: [" UI64FMTD "] is being teleported %s to dungeon ID [%u]", player->GetGUID(), out ? "out" : "in", dungeon ? dungeon->ID : 0);
+        //sLog->outAshran("LFGMgr::TeleportPlayer: [" UI64FMTD "] is being teleported %s to dungeon ID [%u]", player->GetGUID(), out ? "out" : "in", dungeon ? dungeon->ID : 0);
     }
 
     LfgTeleportError error = LFG_TELEPORTERROR_OK;
