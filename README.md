@@ -5,10 +5,10 @@ Harbringers is a 6.2.3 Project based off Trinitycore and HellscreamCore which is
 
 # Updated Core Compilation/Building Requirements as of 05.10.21
 
-- OpenSSL 1.0.2 (no LITE Version!) 
+- OpenSSL 1.1.1 (no LITE Version!) 
 - Cmake 3.21.3 
 - Visual Studio 2019 
-- MySQL 5.7 (5.5, 5.6 support) 
+- MySQL 8.0 (5.5, 5.6 support) 
 
 # Credits
 
