@@ -410,7 +410,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& p_Packet)
         return;
 
     Mail * l_Mail = m_Player->GetMail(l_MailID);
-    if (!l_Mail || l_Mail->state == MAIL_STATE_DELETED || l_Mail->deliver_time > time(NULL))
+    if (!l_Mail || l_Mail->state == MAIL_STATE_DELETED || l_Mail->deliver_time > time(NULL) || (l_Mail->checked & MAIL_CHECK_MASK_COPIED))
     {
         m_Player->SendMailResult(l_MailID, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
         return;
